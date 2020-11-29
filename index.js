@@ -3,17 +3,13 @@ require('dotenv').config()
 const puppeteer = require('puppeteer');
 const leagueId = process.env.LEAGUE_ID || ''
 const rostersUrl = `https://fantasy.espn.com/basketball/league/rosters?leagueId=${leagueId}&seasonId=2020`;
-const rookies = {
-    'Zion Williamson': true,
-    'Ja Morant': true,
-}
+
 
 
 const doPuppeteer = async () => {
     const browser = await puppeteer.launch();
     const page = await browser.newPage();
 
-    console.log('rookies', rookies)
     await page.goto(rostersUrl, {
         waitUntil: 'networkidle0',
     });
@@ -29,6 +25,10 @@ const doPuppeteer = async () => {
 
     const stories = await page.evaluate(() => {
         let teamElement = Array.prototype.slice.call(document.getElementsByClassName('ResponsiveTable'))
+        let rookies = {
+            'Zion Williamson': true,
+            'Ja Morant': true,
+        }
 
         console.log('teamElement', teamElement)
         return teamElement.map((teamEl) => {
@@ -43,7 +43,7 @@ const doPuppeteer = async () => {
             return {
                 team: teamEl.querySelector('.teamName').title,
                 roster,
-                rookies: roster.filter(player => {
+                rooks: roster.filter(player => {
                     return rookies[player]
                 })
 
